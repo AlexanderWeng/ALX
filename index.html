@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>ALX-PLAN — Mind Plan & Task Board</title>
+<meta name="description" content="ALX-PLAN — วางแผนความคิดด้วย Mind Plan แบบ pan/zoom ไม่จำกัดพื้นที่ แล้วลงมือทำผ่าน Task Board สไตล์ modern white sci-fi · พัฒนาโดย Alexander_Weng">
+<meta name="theme-color" content="#00C2D9">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="apple-touch-icon" href="favicon.svg">
+<link rel="manifest" href="site.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css?v=6">
+</head>
+<body>
+
+<div class="grid-bg" aria-hidden="true"></div>
+<div class="glow-orb orb-a" aria-hidden="true"></div>
+<div class="glow-orb orb-b" aria-hidden="true"></div>
+
+<header class="hud-nav">
+  <div class="brand">
+    <span class="brand-mark" aria-hidden="true">
+      <i class="ring ring-1"></i><i class="ring ring-2"></i><i class="ring ring-3"></i>
+      <i class="core"></i><i class="spark spark-1"></i><i class="spark spark-2"></i>
+    </span>
+    <span class="brand-text">ALX-PLAN</span>
+  </div>
+
+  <nav class="hud-tabs" role="tablist" aria-label="หน้าหลัก">
+    <button class="hud-tab is-active" data-view="mindplan" role="tab" aria-selected="true">
+      <svg viewBox="0 0 24 24" class="tab-icon"><path d="M12 2a5 5 0 0 0-5 5c0 1.9.9 3.2 2 4.2V14h6v-2.8c1.1-1 2-2.3 2-4.2a5 5 0 0 0-5-5Z"/><path d="M9.5 17h5M10 20h4"/></svg>
+      <span>Mind Plan</span>
+    </button>
+    <button class="hud-tab" data-view="board" role="tab" aria-selected="false">
+      <svg viewBox="0 0 24 24" class="tab-icon"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16M15 4v16"/></svg>
+      <span>Task Board</span>
+    </button>
+  </nav>
+
+  <div class="hud-actions">
+    <button class="sync-pill" id="btnOpenSync" type="button" title="สถานะการเชื่อมต่อ">
+      <span class="sync-pill-inner" id="syncPill"><i class="dot"></i><span>บันทึกในเครื่องอัตโนมัติ</span></span>
+    </button>
+    <button class="settings-btn" id="btnOpenSettings" type="button" title="การตั้งค่า / Settings">
+      <svg viewBox="0 0 24 24" class="settings-icon"><path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"/><path d="M19.4 13a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V19a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1.08-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H4a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 5.6 8.6a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H10a1.65 1.65 0 0 0 1-1.51V2a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V8a1.65 1.65 0 0 0 1.51 1H20a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg>
+    </button>
+  </div>
+</header>
+
+<main>
+
+  <!-- ================= MIND PLAN ================= -->
+  <section id="view-mindplan" class="view is-active" aria-labelledby="mindplan-heading">
+    <div class="view-header">
+      <div>
+        <p class="view-eyebrow">01 — คิดก่อนลงมือ</p>
+        <h1 id="mindplan-heading" class="view-title">Mind Plan</h1>
+        <p class="view-sub">แตกความคิดออกจากศูนย์กลาง ลาก/เลื่อน/ซูมพื้นที่คิดได้ไม่จำกัด แล้วส่งกิ่งที่พร้อมลงมือไปยัง Task Board</p>
+        <p class="board-progress" id="planProgress"></p>
+      </div>
+      <div class="view-toolbar">
+        <button class="btn btn-ghost" id="btnArrange" title="จัดเรียงผังอัตโนมัติแบบไม่ทับกัน">
+          <svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/></svg>
+          จัดเรียงอัตโนมัติ
+        </button>
+        <button class="btn btn-primary" id="btnAddNode">
+          <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+          เพิ่มโหนดความคิด
+        </button>
+      </div>
+    </div>
+
+    <div class="plan-bar" id="planBar"></div>
+
+    <div class="mindmap-wrap">
+      <div class="mindmap-canvas" id="mindmapCanvas">
+        <div class="mm-dotfield" id="mmDotfield" aria-hidden="true"></div>
+        <div class="mm-world" id="mmWorld">
+          <svg id="mindmapSvg" class="mindmap-svg"></svg>
+          <div class="mindmap-nodes" id="mindmapNodes"></div>
+        </div>
+        <div class="zoom-controls">
+          <button type="button" id="btnZoomIn" title="ซูมเข้า"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
+          <button type="button" id="btnZoomReset" title="รีเซ็ตซูม 100%"><span id="zoomLabel">100%</span></button>
+          <button type="button" id="btnZoomOut" title="ซูมออก"><svg viewBox="0 0 24 24"><path d="M5 12h14"/></svg></button>
+          <button type="button" id="btnFitView" title="พอดีกับหน้าจอ"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg></button>
+        </div>
+      </div>
+      <p class="canvas-hint">ลากพื้นหลัง = เลื่อนมุมมอง (pan) · scroll/pinch = ซูม · ลากโหนด = ย้ายตำแหน่ง · แตะโหนด = เลือกเป็นแม่กิ่ง · ลากจุดสีที่มุมโหนด = ต่อกับโหนดอื่น หรือปล่อยที่ว่างเพื่อตัดการเชื่อม</p>
+    </div>
+  </section>
+
+  <!-- ================= TASK BOARD ================= -->
+  <section id="view-board" class="view" aria-labelledby="board-heading">
+    <div class="view-header">
+      <div>
+        <p class="view-eyebrow">02 — ลงมือทำ</p>
+        <h1 id="board-heading" class="view-title">Task Board</h1>
+        <p class="view-sub">ลากการ์ดข้ามคอลัมน์ หรือใช้ปุ่มลูกศรบนมือถือ</p>
+        <p class="board-progress" id="boardProgress"></p>
+      </div>
+      <div class="view-toolbar">
+        <select class="select-filter" id="taskPlanFilter" title="กรองตามแผน"></select>
+        <button class="btn btn-primary" id="btnAddTask">
+          <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+          เพิ่มงานใหม่
+        </button>
+      </div>
+    </div>
+
+    <div class="board-columns" id="boardColumns">
+      <div class="column" data-status="task">
+        <div class="column-head">
+          <span class="col-dot dot-task"></span>
+          <h2>Task</h2>
+          <span class="col-count" id="count-task">0</span>
+        </div>
+        <div class="column-body" data-status="task" id="col-task"></div>
+      </div>
+
+      <div class="column" data-status="doing">
+        <div class="column-head">
+          <span class="col-dot dot-doing"></span>
+          <h2>Doing</h2>
+          <span class="col-count" id="count-doing">0</span>
+        </div>
+        <div class="column-body" data-status="doing" id="col-doing"></div>
+      </div>
+
+      <div class="column" data-status="done">
+        <div class="column-head">
+          <span class="col-dot dot-done"></span>
+          <h2>Done</h2>
+          <span class="col-count" id="count-done">0</span>
+        </div>
+        <div class="column-body" data-status="done" id="col-done"></div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <span>ALX-PLAN</span><span class="dot-sep">·</span><span>Developed by <b>Alexander_Weng</b></span>
+</footer>
+
+<nav class="mobile-tabbar" aria-label="สลับหน้า (มือถือ)">
+  <button class="mtab is-active" data-view="mindplan">
+    <svg viewBox="0 0 24 24"><path d="M12 2a5 5 0 0 0-5 5c0 1.9.9 3.2 2 4.2V14h6v-2.8c1.1-1 2-2.3 2-4.2a5 5 0 0 0-5-5Z"/><path d="M9.5 17h5M10 20h4"/></svg>
+    <span>Mind Plan</span>
+  </button>
+  <button class="mtab" data-view="board">
+    <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16M15 4v16"/></svg>
+    <span>Board</span>
+  </button>
+</nav>
+
+<!-- ============ Node modal ============ -->
+<div class="modal-overlay" id="nodeModalOverlay">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="nodeModalTitle">
+    <div class="modal-head">
+      <h3 id="nodeModalTitle">โหนดความคิด</h3>
+      <button class="modal-close" id="nodeModalClose" aria-label="ปิด">&times;</button>
+    </div>
+    <div class="modal-body">
+      <label class="field">
+        <span>ข้อความ</span>
+        <textarea id="nodeText" rows="2" placeholder="เช่น เปิดตัวเว็บไซต์ใหม่"></textarea>
+      </label>
+
+      <div class="field">
+        <span>สี</span>
+        <div class="color-picker" id="nodeColorPicker">
+          <div class="swatches" id="nodeSwatches">
+            <button type="button" class="swatch" style="--c:#00C2D9" data-color="#00C2D9"></button>
+            <button type="button" class="swatch" style="--c:#6C5CE7" data-color="#6C5CE7"></button>
+            <button type="button" class="swatch" style="--c:#FF4FA0" data-color="#FF4FA0"></button>
+            <button type="button" class="swatch" style="--c:#1FB874" data-color="#1FB874"></button>
+            <button type="button" class="swatch" style="--c:#FFA53E" data-color="#FFA53E"></button>
+          </div>
+          <div class="swatches fav-row" id="nodeFavRow"></div>
+          <div class="swatches shade-row" id="nodeShadeRow"></div>
+          <div class="color-custom-row">
+            <input type="color" id="nodeColorCustom" value="#00C2D9" title="เลือกสีแบบ RGB/HEX เองได้เต็มที่">
+            <button type="button" class="btn btn-outline btn-sm" id="nodeAddFavBtn">★ เพิ่มเป็นสีโปรด</button>
+          </div>
+        </div>
+      </label>
+
+      <label class="field">
+        <span>ไอคอนโหนด</span>
+        <div class="type-picker" id="nodeIconPicker"></div>
+      </label>
+
+      <div class="field-row">
+        <label class="field">
+          <span class="switch-row">
+            <input type="checkbox" id="nodeProgressManualToggle">
+            กำหนด % ความคืบหน้าเอง
+          </span>
+          <span class="range-row">
+            <input type="range" id="nodeProgressRange" min="0" max="100" value="50">
+            <span id="nodeProgressValue" class="range-val">50%</span>
+          </span>
+        </label>
+        <label class="field">
+          <span class="switch-row">
+            <input type="checkbox" id="nodeActiveToggle">
+            กำลังดำเนินการอยู่ตอนนี้ (Active)
+          </span>
+        </label>
+      </div>
+
+      <label class="field">
+        <span>กำหนดเวลา (ไม่บังคับ)</span>
+        <input type="date" id="nodeDueInput">
+      </label>
+
+      <div class="node-link-info is-empty" id="nodeLinkInfo"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-danger" id="nodeDeleteBtn">ลบโหนด</button>
+      <div class="modal-foot-right">
+        <button class="btn btn-outline" id="nodeToTaskBtn">
+          <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          ส่งไป Task Board
+        </button>
+        <button class="btn btn-primary" id="nodeSaveBtn">บันทึก</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ Task modal ============ -->
+<div class="modal-overlay" id="taskModalOverlay">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="taskModalTitle">
+    <div class="modal-head">
+      <h3 id="taskModalTitle">งานใหม่</h3>
+      <button class="modal-close" id="taskModalClose" aria-label="ปิด">&times;</button>
+    </div>
+    <div class="modal-body">
+      <label class="field">
+        <span>ชื่องาน</span>
+        <input type="text" id="taskTitle" placeholder="เช่น ออกแบบหน้า Landing Page">
+      </label>
+      <label class="field">
+        <span>รายละเอียด (ไม่บังคับ)</span>
+        <textarea id="taskNotes" rows="2" placeholder="รายละเอียดเพิ่มเติม..."></textarea>
+      </label>
+      <label class="field">
+        <span>แผนที่งานนี้สังกัด</span>
+        <select id="taskPlanSelect"></select>
+      </label>
+      <div class="field-row">
+        <label class="field">
+          <span>ความสำคัญ</span>
+          <select id="taskPriority">
+            <option value="low">ต่ำ</option>
+            <option value="mid" selected>ปานกลาง</option>
+            <option value="high">สูง</option>
+          </select>
+        </label>
+        <label class="field">
+          <span>กำหนดส่ง</span>
+          <input type="date" id="taskDue">
+        </label>
+      </div>
+      <label class="field">
+        <span>สถานะ</span>
+        <div class="seg" id="taskStatusSeg">
+          <button type="button" class="seg-btn is-active" data-status="task">Task</button>
+          <button type="button" class="seg-btn" data-status="doing">Doing</button>
+          <button type="button" class="seg-btn" data-status="done">Done</button>
+        </div>
+      </label>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-danger" id="taskDeleteBtn">ลบงาน</button>
+      <div class="modal-foot-right">
+        <button class="btn btn-outline" id="taskBreakdownBtn" title="แตกงานนี้เป็นขั้นตอนย่อยใน Mind Plan">
+          <svg viewBox="0 0 24 24"><path d="M4 12h6M10 12l-3-3M10 12l-3 3"/><path d="M14 5h6M14 12h6M14 19h6"/><path d="M10 12h4M14 5v0M14 19v0"/></svg>
+          Task → Mind Plan
+        </button>
+        <button class="btn btn-primary" id="taskSaveBtn">บันทึกงาน</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ Breakdown (Task → Mind Plan sub-steps) modal ============ -->
+<div class="modal-overlay" id="breakdownModalOverlay">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="breakdownModalTitle">
+    <div class="modal-head">
+      <h3 id="breakdownModalTitle">แตกงานเป็นขั้นตอนย่อย</h3>
+      <button class="modal-close" id="breakdownModalClose" aria-label="ปิด">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p class="sync-hint" id="breakdownTaskLabel" style="margin:0;"></p>
+      <label class="field">
+        <span>ขั้นตอนย่อย (1 บรรทัด = 1 ขั้นตอน เรียงตามลำดับ)</span>
+        <textarea id="breakdownSteps" rows="6" placeholder="เช่น&#10;ร่าง wireframe คร่าว ๆ&#10;ออกแบบ UI ใน Figma&#10;ตัด HTML/CSS&#10;เชื่อม API"></textarea>
+      </label>
+      <p class="sync-hint">แต่ละบรรทัดจะกลายเป็นโหนดต่อกันเป็นเส้นตรง (1 → 2 → 3 → ...) ต่อออกจากโหนดของงานนี้ใน Mind Plan ไปที่แผนที่ความคิดได้ทันทีหลังกดยืนยัน</p>
+    </div>
+    <div class="modal-foot">
+      <span></span>
+      <div class="modal-foot-right">
+        <button class="btn btn-ghost" id="breakdownCancelBtn">ยกเลิก</button>
+        <button class="btn btn-primary" id="breakdownConfirmBtn">สร้างในแผนที่ความคิด</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ Plan modal ============ -->
+<div class="modal-overlay" id="planModalOverlay">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="planModalTitle">
+    <div class="modal-head">
+      <h3 id="planModalTitle">แผนใหม่</h3>
+      <button class="modal-close" id="planModalClose" aria-label="ปิด">&times;</button>
+    </div>
+    <div class="modal-body">
+      <label class="field">
+        <span>ชื่อแผน</span>
+        <input type="text" id="planName" placeholder="เช่น เปิดตัวสินค้าใหม่">
+      </label>
+      <div class="field">
+        <span>สีประจำแผน</span>
+        <div class="color-picker" id="planColorPicker">
+          <div class="swatches" id="planSwatches">
+            <button type="button" class="swatch" style="--c:#00C2D9" data-color="#00C2D9"></button>
+            <button type="button" class="swatch" style="--c:#6C5CE7" data-color="#6C5CE7"></button>
+            <button type="button" class="swatch" style="--c:#FF4FA0" data-color="#FF4FA0"></button>
+            <button type="button" class="swatch" style="--c:#1FB874" data-color="#1FB874"></button>
+            <button type="button" class="swatch" style="--c:#FFA53E" data-color="#FFA53E"></button>
+          </div>
+          <div class="swatches fav-row" id="planFavRow"></div>
+          <div class="swatches shade-row" id="planShadeRow"></div>
+          <div class="color-custom-row">
+            <input type="color" id="planColorCustom" value="#00C2D9" title="เลือกสีแบบ RGB/HEX เองได้เต็มที่">
+            <button type="button" class="btn btn-outline btn-sm" id="planAddFavBtn">★ เพิ่มเป็นสีโปรด</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-danger" id="planDeleteBtn">ลบแผนนี้</button>
+      <div class="modal-foot-right">
+        <button class="btn btn-primary" id="planSaveBtn">บันทึกแผน</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ Settings modal (menu) ============ -->
+<div class="modal-overlay" id="settingsModalOverlay">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="settingsModalTitle">
+    <div class="modal-head">
+      <h3 id="settingsModalTitle">การตั้งค่า</h3>
+      <button class="modal-close" id="settingsModalClose" aria-label="ปิด">&times;</button>
+    </div>
+    <div class="modal-body">
+      <button type="button" class="settings-menu-item" id="settingsJoinPlanItem">
+        <span class="settings-menu-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M17 8l4 4-4 4M21 12H9"/><path d="M13 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h7"/></svg>
+        </span>
+        <span class="settings-menu-text">
+          <span class="settings-menu-title">Join Plan</span>
+          <span class="settings-menu-sub" id="settingsJoinPlanSub">ยังไม่ได้เชื่อมต่อ — ออฟไลน์</span>
+        </span>
+        <svg viewBox="0 0 24 24" class="settings-menu-arrow"><path d="M9 6l6 6-6 6"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ Join Plan (Supabase join-code) modal ============ -->
+<div class="modal-overlay" id="syncModalOverlay">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="syncModalTitle">
+    <div class="modal-head">
+      <button class="modal-back" id="syncModalBack" aria-label="กลับ" type="button">
+        <svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>
+      </button>
+      <h3 id="syncModalTitle">Join Plan</h3>
+      <button class="modal-close" id="syncModalClose" aria-label="ปิด">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p class="sync-status" id="syncStatusText">ยังไม่ได้เชื่อมต่อ</p>
+
+      <div class="sync-code-box" id="syncCodeBox" style="display:none">
+        <span class="sync-code" id="syncCodeDisplay">------</span>
+        <button type="button" class="btn btn-outline btn-sm" id="syncCopyBtn">คัดลอกรหัส</button>
+      </div>
+
+      <details class="sync-advanced" id="syncAdvancedDetails" open>
+        <summary>ขั้นตอนที่ 1 — ตั้งค่า Supabase (ทำครั้งเดียวต่อโปรเจกต์)</summary>
+        <p class="sync-hint" style="margin-top:8px">ต้องใส่ <b>URL + anon key ชุดเดียวกัน</b> บนทุกอุปกรณ์ (ทั้ง PC และมือถือ) ก่อนถึงจะสร้างรหัสหรือเข้าร่วมแผนได้ ต้องสร้างตาราง <code>mindplans</code> ในโปรเจกต์ Supabase ก่อน (ดู SQL ตัวอย่างใน README)</p>
+        <label class="field">
+          <span>Supabase Project URL</span>
+          <input type="text" id="syncUrlInput" placeholder="https://xxxx.supabase.co">
+        </label>
+        <label class="field">
+          <span>Supabase anon public key</span>
+          <input type="text" id="syncKeyInput" placeholder="eyJhbGciOi...">
+        </label>
+        <button type="button" class="btn btn-ghost" id="syncSaveConfigBtn">บันทึกการตั้งค่า</button>
+        <p class="sync-hint">ค่านี้เก็บเฉพาะในเบราว์เซอร์นี้เท่านั้น ไม่ถูกส่งไปที่ไหนอื่น</p>
+      </details>
+
+      <p class="sync-hint" style="margin:2px 0 -4px; font-weight:700; color:var(--muted)">ขั้นตอนที่ 2 — สร้างรหัส หรือ เข้าร่วมด้วยรหัสจากอุปกรณ์อื่น</p>
+
+      <label class="field">
+        <span>มีรหัสจากอุปกรณ์อื่นแล้ว → เข้าร่วมที่นี่</span>
+        <div class="field-row">
+          <input type="text" id="syncJoinInput" placeholder="เช่น A1B2C3" style="flex:1; text-transform:uppercase;">
+          <button type="button" class="btn btn-outline" id="syncJoinBtn">เข้าร่วม</button>
+        </div>
+      </label>
+
+      <div class="field-row">
+        <button type="button" class="btn btn-primary" id="syncGenerateBtn" style="flex:1">
+          ยังไม่มีรหัส → สร้างรหัสเชื่อมต่อใหม่
+        </button>
+      </div>
+
+      <button type="button" class="btn btn-danger" id="syncDisconnectBtn" style="display:none">ยกเลิกการเชื่อมต่อ / กลับไปใช้ออฟไลน์</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="app.js?v=6"></script>
+</body>
+</html>

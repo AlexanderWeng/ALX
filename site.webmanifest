@@ -1,0 +1,12 @@
+{
+  "name": "ALX-PLAN — Mind Plan & Task Board",
+  "short_name": "ALX-PLAN",
+  "description": "Mind Plan แบบ pan/zoom ไม่จำกัดพื้นที่ พร้อม Task Board — พัฒนาโดย Alexander_Weng",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#F5F8FC",
+  "theme_color": "#00C2D9",
+  "icons": [
+    { "src": "favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
