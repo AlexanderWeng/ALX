@@ -558,9 +558,22 @@
   const dotfield = document.getElementById("mmDotfield");
 
   function ensureSvgDefs() {
+    // IMPORTANT: gradientUnits must be "userSpaceOnUse" with fixed, absolute
+    // coordinates here — NOT the default "objectBoundingBox" (i.e. plain
+    // x1/y1/x2/y2 between 0 and 1). With objectBoundingBox, the gradient is
+    // computed relative to each individual <line>'s own bounding box, and
+    // when a line is perfectly horizontal or vertical (zero-height or
+    // zero-width box — exactly what layoutRadial()/"จัดเรียงอัตโนมัติ"
+    // produces for any straight chain of nodes) that box degenerates and
+    // browsers simply fail to paint the gradient at all: the line stays in
+    // the DOM with correct coordinates but renders fully invisible. That
+    // was the "connector lines disappear after Arrange" bug. Using a large
+    // fixed userSpaceOnUse range instead makes the gradient's math depend
+    // only on absolute canvas position, never on any single line's own
+    // (possibly zero-area) bounding box, so it can never disappear again.
     svg.innerHTML = `
       <defs>
-        <linearGradient id="linkGrad" x1="0" y1="0" x2="1" y2="1">
+        <linearGradient id="linkGrad" x1="-4000" y1="-4000" x2="4000" y2="4000" gradientUnits="userSpaceOnUse">
           <stop offset="0%" stop-color="#00C2D9"/>
           <stop offset="100%" stop-color="#6C5CE7"/>
         </linearGradient>
